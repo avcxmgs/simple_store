@@ -9,3 +9,13 @@
 #   end
 
 Product.destroy_all
+
+for a in 1..676 do
+  new_product = Product.new
+  new_product.title = Faker::Commerce.unique.product_name
+  new_product.price = Faker::Commerce.price(range: 0..10.0)
+  new_product.stock_quantity = Faker::Number.between(from: 10, to: 200)
+  new_product.save
+end
+
+p "Created #{Product.count} products."
