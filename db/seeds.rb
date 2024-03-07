@@ -8,14 +8,31 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
+require 'csv'
+
 Product.destroy_all
 
-for a in 1..676 do
-  new_product = Product.new
-  new_product.title = Faker::Commerce.unique.product_name
-  new_product.price = Faker::Commerce.price(range: 0..10.0)
-  new_product.stock_quantity = Faker::Number.between(from: 10, to: 200)
-  new_product.save
+Category.destroy_all
+
+csv_file = Rails.root.join('db/products.csv')
+csv_data = File.read(csv_file)
+
+products = CSV.parse(csv_data, headers: true)
+
+# If CSV was created by Excel in Windows you may also need to set an encoding type:
+# products = CSV.parse(csv_data, headers: true, encoding: 'iso-8859-1')
+
+products.each do |product|
+  # Create categories and products here.
+  category = Category.find_or_create_by(name: product['category'])
+
+  new_product = Product.create(title: product['name'],
+                               price: product['price'],
+                               description: product['description'],
+                               stock_quantity: product['stock quantity'],
+                               category_id: category.id)
+
+  # puts "#{new_product.inspect}"
 end
 
-p "Created #{Product.count} products."
+puts "Created #{Product.count} products and #{Category.count} categories."
